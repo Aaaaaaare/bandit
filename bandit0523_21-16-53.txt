@@ -1,0 +1,7 @@
+type_game: 	finite
+number_plays: 	5000
+number_arms: 	4
+type_reward: 	bernoulli
+is_cost: 	False
+type_cost: 	normal
+ENDED SUCCESsFULLY

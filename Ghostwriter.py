@@ -10,7 +10,7 @@ class Ghostwriter:
 	def write(self, string):
 		try:
 			with open(self.name, "a") as outfile:
-				outfile.write(string)
+				outfile.write(string + '\n')
 		except IOError:
 			print ('Could not open file')
 
@@ -25,7 +25,7 @@ class Ghostwriter:
 					# 	else:
 					# 		outfile.write('%s : %s\n' % (k, v))
 					for x in _obj:
-						outfile.write('{}: {}'.format(x, _obj[x]))
+						outfile.write('{}: \t{}\n'.format(x, _obj[x]))
 				elif type(_obj) == list:
 					# for v in _obj:
 					# 	if hasattr(v, '__iter__'):
@@ -33,7 +33,7 @@ class Ghostwriter:
 					# 	else:
 					# 		outfile.write(v + '\n')
 					for x in _obj:
-						outfile.write(x)
+						outfile.write(x + '\n')
 				else:
 					outfile.write(_obj + '\n')
 		except IOError:

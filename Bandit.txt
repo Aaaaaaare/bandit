@@ -1,0 +1,66 @@
+Bandit
+
+
+Read the hot hand problem
+https://www.facebook.com/lonrot/videos/2011214785764037/
+
+
+
+
++ I need to do my own policy with no agent, or maybe an special agent (I need to read the algorithm again)
++ I dont need to implement the algorithm of the girl, I think.
++ I need to read the other paper to deal with the infinitely many arms and adapt the already implemented algorithms to the infinitely many scenario.
++ Does this one has cost? If not, I can add the ideas of the other to add the cost part!!!!
+
+
+- I need to answer: "Should I keep searching? Is the best arm found already? Am I making progress looking for better arms? ... " in the problem of finding the best arm in an infinite scenario.
+- I need to define the scenario in which a case of finite mandit equas a case of infinitely many bandits.
+!- A ranking method for multi arms
+
+
+
+
+Notebook
+py -m notebook
+
+
+UCB-V(inf) - infinite arms 2009
+
+KL-UCB - 2011
+
+Bayes-UCB - 2012
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+conda install anaconda-client
+
+
+Environment: forslot
+
+BDD-01 Koide & Reiko Nakamori Far Corps Mara Hug

@@ -123,13 +123,14 @@ class bandit:
         return self.arms[index].play()
 
     def best_arm_reward(self):
-        #best_arm_ = sorted(self.arms, key=lambda arm: arm.get_Expected_reward())[-1]
-        #return best_arm_.get_Expected_reward()
-        best_arm_ = self.best_arm()
-        return self.arms[best_arm_].get_Expected_reward()
+        best_arm_ = sorted(self.arms, key=lambda arm: arm.get_Expected_reward())[-1]
+        return best_arm_.get_Expected_reward()
+        #best_arm_ = self.best_arm()
+        #return self.arms[best_arm_].get_Expected_reward()
 
     def best_arm(self):
         #b_arm_ = np.argmax(self.arms.get_Expected_reward())
+        # list(data[i] for i in range(len(data)-1, -1, -1)) ?????
         max_rew = -1
         best_arm_ = -1
         for i in range(self.num_arms):

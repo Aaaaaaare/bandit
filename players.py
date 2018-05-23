@@ -353,22 +353,12 @@ class kl_ucb(player):
 	def __init__(self, num_arms, params=None):
 		super().__init__(num_arms)
 		if params != None:
-			if 'zeta' in params:
-				self.zeta = params['zeta']
-			else:
-				self.zeta = 1.2
 			if 'c' in params:
 				self.c = params['c']
 			else:
-				self.c = 1
-			if 'b' in params:
-				self.b = params['b']
-			else:
-				self.b = 1
+				self.c = 0.0
 		else:
-			self.zeta = 1.2
-			self.c = 1
-			self.b = 1
+			self.c = 0.0
 
 		self.num_arms = num_arms
 		self.rewards = np.zeros(num_arms)
@@ -377,53 +367,58 @@ class kl_ucb(player):
 		self.pulls = np.zeros(num_arms)
 		self.t = 0
 
-		self.cold_start = False
+		self.cold_start = True
 
 	def play(self, casino):
 
 		# Handle cold start. Not all bandits tested yet.
 		if self.cold_start:
-			f, arm_ = self.missing_arm()
+			arm_ = self.missing_arm()
 		else:
 			for a_ in range(self.num_arms):
-				self.kl[a_] = get_kl[a_]
-			arm_ = np.argmax(kl)
+				self.kl[a_] = self.get_max_kl(a_)
+			arm_ = np.argmax(self.kl)
 
 		r, c = casino.play_arm(arm_)
-		self.t = self.t + 1
+		
+		self.update(r, c, arm_)
 
-		self.pulls[arm_] = self.pulls[arm_] + 1
-		self.rewards[arm_] = self.rewards[arm_] + r
-		self.costs[arm_] = self.costs[arm_] + c
-
-		self.reward = self.reward + r
-		self.cost = self.cost + c
-
-	def get_kl(self, k):
+	# as noted by Garivier,  for any p ∈ [0, 1] the function
+	# q |--> d(p, q) is strictly convex and increasing on the interval [p, 1].
+	def get_max_kl(self, k):
 		delta = 1e-8
 		eps = 1e-12
-		logndn = np.log(self.t)/self.pulls[k]
+		# by recomendation of Garivier, c = 0
+		logndn = (np.log(self.t)  + self.c*np.log(np.log(self.t)))/self.pulls[k]
+		# logndn = np.log(self.t)/self.pulls[k]
 		p = max(self.rewards[k]/self.pulls[k], delta)
+
+		# if p >= upper bound of the reward
 		if p >= 1:
 			return 1
+
+		# Newton iterations
 		converged = False
 		q = 1.0*p + delta
 		for i in range (20):
 			if not converged:
-				f = logndn - kl_div(p, q)
-				df = - dkl_div(p, q)
+				f = logndn - self.kl_div(p, q)
+				df = - self.dkl_div(p, q)
 				if f*f < eps:
 					converged = True
-				q = min(1-delta, max(q-f/df, p+delta))
+				q = min(1-delta, max(q-np.nan_to_num(f/df), p+delta))
 		if not converged:
-			print ('WARNING: kl didnt converged for arm {}'.format(k))
+
+			print ('WARNING: kl didn\'t converged for arm {}. t = {}'.format(k, self.t))
 		return q
 
+	#computes the kl divergence
 	def kl_div(self, p, q):
 		t1 = p*np.log(p/q)
 		t2 = (1.0-p)*np.log((1.0-p)/(1.0-q))
 		return (t1+t2)
 
+	# differenciate with respect to q, the variable
 	def dkl_div(self, p, q):
 		return (q-p)/(q*(1.0-q))
 
@@ -431,9 +426,10 @@ class kl_ucb(player):
 	def missing_arm(self):
 		for a_ in range(self.num_arms):
 			if self.pulls[a_] == 0:
-				if a_ == self.num_arms - 1:
+				if a_ == (self.num_arms - 1):
 					self.cold_start = False
 				return a_
+		return -1
 
 	def best_arm(self):
 		return np.argmax(self.rewards / (self.pulls + 0.01))
