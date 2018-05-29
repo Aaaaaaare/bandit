@@ -26,6 +26,7 @@ class Ghostwriter:
 					# 		outfile.write('%s : %s\n' % (k, v))
 					for x in _obj:
 						outfile.write('{}: \t{}\n'.format(x, _obj[x]))
+						
 				elif type(_obj) == list:
 					# for v in _obj:
 					# 	if hasattr(v, '__iter__'):

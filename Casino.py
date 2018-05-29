@@ -11,15 +11,12 @@ class arm:
         self._cost = is_cost
 
         if parameters != None:
-            # The cost can only be a normal parameter with variance 0.1
-            # and mean given or set to 0.5
+            # The cost can only follow a uniform distribution
             if self._cost == True:
                 if 'cost' in parameters:
-                    self.cost_mean = parameters['cost']
+                    self.cost_upper = parameters['cost']
                 else:
-                    self.cost_mean = 0.5
-                self.cost_var = 0.1
-    
+                    self.cost_upper = np.random.rand()
             if 'mean' in parameters:
                 self.mean = parameters['mean']    
     
@@ -38,6 +35,8 @@ class arm:
                 self.prob = np.random.rand()
             if type_b == 'uniform':
                 self.upper = np.random.rand()
+            if self._cost:
+                self.cost_upper = np.random.rand()
         
         if self.type not in types:
             raise NameError('ERROR 1: Payoff distribution not recognized')
@@ -94,19 +93,22 @@ class arm:
             return 1
             
     def generate_cost(self):
-        if not self._cost:
-            return 0
+        if self._cost:
+            return np.random.uniform(0, self.cost_upper)
         else:
-            return max(np.random.normal(self.cost_mean, self.cost_vart), 0)
-            
+            #return max(np.random.normal(self.cost_mean, self.cost_vart), 0)
+            return 0
                 
 class bandit:
     def __init__(self, num_arms=2, type_b='bernoulli', is_cost=False, infinity=False, params=None):
+        self.infinity = infinity
         self.num_arms = num_arms
         self.type_b = type_b
         self.is_cost = is_cost
         self.arms = [ arm(type_b=self.type_b, is_cost=self.is_cost, random=True) for i in range(self.num_arms)]
         self.t = 0
+
+        self.best_mean_reward = self.best_arm_reward()
 
     def add_arm(self, given_arm):
         if type(given_arm) == arm:
@@ -139,6 +141,12 @@ class bandit:
                 best_arm_ = i
                 max_rew = new_rew
         return best_arm_
+
+    def get_arm_i_expected_reward(self, i):
+        return self.arms[i].get_Expected_reward()
+
+    def get_best_expected_reward(self):
+        return self.best_mean_reward
 
     def print_all_arms(self):
         for i, arm in enumerate(self.arms):

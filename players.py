@@ -2,45 +2,109 @@ import numpy as np
 
 
 # Generic player
-
-
 class player:
-	def __init__(self, num_arms):
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
+	def __init__(self, num_arms=10, budget=1, is_infinity=False):
+		# When infinity arms are present, the idea is to play
+		# with random arms. So we need random indexes.
+		self.all_arms = np.arange(num_arms)
+		
+		if is_infinity:
+			np.random.shuffle(self.all_arms)
+
+		# If it is infinity, then we pick random k arms, following
+		# the k definition in the paper of those guys
+		self.c = 1.0
+		self.beta = 1
+		if is_infinity:
+			if self.beta < 1:
+				self.num_arms = self.c * np.power(self.budget, self.beta/2.0)
+			elif self.beta >= 1:
+				self.num_arms = self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0))
+			else:
+				print ('ERROR in beta value. Working with all arms')
+				self.num_arms = num_arms
+		else:
+			self.num_arms = num_arms
+
+		#self.all_arms = np.zeros(num_arms)
+		self.rewards = np.zeros(self.num_arms)
+		self.costs = np.zeros(self.num_arms)
+		self.pulls = np.zeros(self.num_arms)
 		self.reward = 0.0
 		self.cost = 0.0
+		self.budget = budget
+		self.valid_budget = budget
 		self.t = 0
+		self.is_infinity = is_infinity
+
 
 	def play(self, casino):
+		#Do nothing
 		self.reward = self.reward + 0.0
 		self.cost = self.cost + 0.0
 		self.t = self.t + 1
+
+	def play_masked_arm(self, casino, arm_):
+		arm_masked = self.all_arms[arm_]
+		r, c = casino.play(arm_masked)
+		return r, c
+
+	def get_num_arms(self):
+		return self.num_arms
 
 	def get_prize(self):
 		return self.reward, self.cost
 
 	def regret(self, casino):
-		best_arm_ = casino.best_arm_reward()
-		return (best_arm_ - (self.get_prize()[0]*.1)/(1.0*self.t))
+		best_arm_reward = casino.get_best_expected_reward()
+		return (best_arm_reward - (self.get_prize()[0]*1.0)/(1.0*self.t))
+
+	def local_regret(self, casino):
+		best_local_arm_reward = -10
+		for j in self.num_arms:
+			i = self.all_arms[j]
+			rr = casino.get_arm_i_expected_reward(i)
+			if rr > best_local_arm_reward:
+				best_local_arm_reward = rr
+
+		return (best_local_arm_reward - (self.get_prize()[0]*1.0)/(1.0*self.t))
 
 	def update(self, r, c, arm_):
-		self.t = self.t + 1
-		self.pulls[arm_] = self.pulls[arm_] + 1
-		self.rewards[arm_] = self.rewards[arm_] + r
-		self.costs[arm_] = self.costs[arm_] + c
+		
+		self.budget = self.budget - c
 
-		self.reward = self.reward + r
-		self.cost = self.cost + c
+		if self.budget >= 0:
+			self.valid_budget = self.budget
+			self.reward = self.reward + r
+			self.cost = self.cost + c
+
+			self.t = self.t + 1
+			self.pulls[arm_] = self.pulls[arm_] + 1
+			self.rewards[arm_] = self.rewards[arm_] + r
+			self.costs[arm_] = self.costs[arm_] + c
+		else:
+			print ('Player {}: Budget exhausted. Action {} denied\n\tFinal remaining budget: {}'.format(self.get_id(), self.t+1, self.budget+c))
+
+	def remaining_budget(self):
+		return self.budget
+
+	def remaining_valid_budget(self):
+		return self.valid_budget
 
 	def best_arm(self):
 		return np.argmax(self.rewards/(self.pulls + 0.01))
 
+	def best_arm_casino(self):
+		j = (int)(self.best_arm())
+		return self.all_arms[j]
+
+	def get_total_plays(self):
+		return self.t
+
 	def get_id(self):
 		return 'Generic'
 
+	# returns the first arm that founds that hasnt been played
 	def missing_arm(self):
 		for a_ in range(self.num_arms):
 			if self.pulls[a_] == 0:
@@ -57,27 +121,21 @@ class player:
 # =============================================================
 
 class random_player(player):
-	def __init__(self, num_arms):
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
-		self.reward = 0.0
-		self.cost = 0.0
-		self.t = 0
+	def __init__(self, num_arms, budget, is_infinity):
+		super().__init__(num_arms, budget, is_infinity)
 
 	def play(self, casino):
 		arm_ = np.random.randint(self.num_arms)
-		r, c = casino.play_arm(arm_)
+
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 
 		self.update(r, c, arm_)
 
-	def regret(self, casino):
-		best_arm_ = casino.best_arm_reward()
-		return (best_arm_ - (self.get_prize()[0]*.1)/(1.0*self.t))
-
 	def get_id(self):
-		return 'Radom'
+		return 'Random'
 
 
 # =============================================================
@@ -86,8 +144,8 @@ class random_player(player):
 # =============================================================
 
 class eps_greedy_player(player):
-	def __init__(self, num_arms, params=None):
-		super().__init__(num_arms)
+	def __init__(self, num_arms, budget, is_infinity, params=None):
+		super().__init__(num_arms, budget, is_infinity)
 		if params != None:
 			if 'epsilon' in params:
 				self.epsilon = params['epsilon']
@@ -97,11 +155,6 @@ class eps_greedy_player(player):
 			self.epsilon = 0.1
 		self.epsilon = self.epsilon/(self.num_arms-1)
 
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
-
 	def play(self, casino):
 		# the value to test agaisnt epsilon
 		e = np.random.rand()
@@ -110,11 +163,13 @@ class eps_greedy_player(player):
 		if e < self.epsilon:
 			arm_ = np.random.choice(list(set(range(self.num_arms)) -
                                     {self.best_arm()}))
-
 		else:
 			arm_ = self.best_arm()
 		
-		r, c = casino.play_arm(arm_)
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 
 		self.update(r, c, arm_)
 
@@ -138,8 +193,8 @@ class eps_greedy_player(player):
 # =============================================================
 
 class softmax_player(player):
-	def __init__(self, num_arms, params=None):
-		super().__init__(num_arms)
+	def __init__(self, num_arms, budget, is_infinity, params=None):
+		super().__init__(num_arms, budget, is_infinity)
 		if params != None:
 			if 'tau' in params:
 				self.tau = params['tau']
@@ -148,11 +203,6 @@ class softmax_player(player):
 		else:
 			self.tau = 0.1
 
-
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
 		self.q = np.zeros(self.num_arms)
 		self.cold_start = True
 		self.start = True
@@ -166,15 +216,12 @@ class softmax_player(player):
 			self.norm = sum(np.exp(self.q/self.tau))
 
 			soft_probs = np.exp(self.q/self.tau)/self.norm
-
 			cumulative_prob = [sum(soft_probs[:i+1]) for i in range(len(soft_probs))]
 
 			index = np.random.rand()
-
 			found = False
 			arm_ = None
 			i = 0
-
 			while not found:
 				if index < cumulative_prob[i]:
 					arm_ = i
@@ -182,7 +229,10 @@ class softmax_player(player):
 				else:
 					i += 1
 
-		r, c = casino.play_arm(arm_)
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 
 		self.update(r, c, arm_)
 
@@ -208,8 +258,8 @@ class softmax_player(player):
 # =============================================================
 
 class ucb1(player):
-	def __init__(self, num_arms, params=None):
-		super().__init__(num_arms)
+	def __init__(self, num_arms, budget, is_infinity, params=None):
+		super().__init__(num_arms, budget, is_infinity)
 		if params != None:
 			if 'epsilon' in params:
 				self.epsilon = params['epsilon']
@@ -222,11 +272,6 @@ class ucb1(player):
 		else:
 			self.epsilon = 0.1
 			self.cold_start = True
-
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
 
 		if self.cold_start:
 			self.varepsilon = 0.0
@@ -245,7 +290,10 @@ class ucb1(player):
 			ucb_ = q + np.sqrt(2*np.log(total_pulls)/(self.pulls + self.varepsilon))
 			arm_ = np.argmax(ucb_) 
 
-		r, c = casino.play_arm(arm_)
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 
 		self.update(r, c, arm_)
 			
@@ -268,8 +316,8 @@ class ucb1(player):
 #	http://certis.enpc.fr/~audibert/ucb_alt.pdf
 # =============================================================
 class ucb_v(player):
-	def __init__(self, num_arms, params=None):
-		super().__init__(num_arms)
+	def __init__(self, num_arms, budget, is_infinity, params=None):
+		super().__init__(num_arms, budget, is_infinity)
 		if params != None:
 			if 'zeta' in params:
 				self.zeta = params['zeta']
@@ -288,11 +336,7 @@ class ucb_v(player):
 			self.c = 1
 			self.b = 1
 
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.rewards2 = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
+		self.rewards2 = np.zeros(self.num_arms)
 		self.cold_start = True
 		self.t = 0
 
@@ -308,28 +352,36 @@ class ucb_v(player):
 			ucbv_ = x_barr + np.sqrt(2*variance*np.log(self.t)/self.pulls) + 3*self.c*self.b*np.log(self.t)/self.pulls
 			arm_ = np.argmax(ucbv_)
 
-		r, c = casino.play_arm(arm_)
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 
 		self.update_all(r, c, arm_)
 
 	# returns the first arm that founds that hasnt been played
-	def missing_arm(self):
-		for a_ in range(self.num_arms):
-			if self.pulls[a_] == 0:
-				if a_ == (self.num_arms - 1):
-					self.cold_start = False
-				return a_
-		return -1
+	# def missing_arm(self):
+	# 	for a_ in range(self.num_arms):
+	# 		if self.pulls[a_] == 0:
+	# 			if a_ == (self.num_arms - 1):
+	# 				self.cold_start = False
+	# 			return a_
+	# 	return -1
 
 	def update_all(self, r, c, arm_):
-		self.pulls[arm_] = self.pulls[arm_] + 1
-		self.rewards[arm_] = self.rewards[arm_] + r
-		self.rewards2[arm_] = self.rewards2[arm_] + r*r
-		self.costs[arm_] = self.costs[arm_] + c
+		self.budget = self.budget - c 
+		if self.budget >= 0:
+			self.valid_budget = self.budget
+			self.pulls[arm_] = self.pulls[arm_] + 1
+			self.rewards[arm_] = self.rewards[arm_] + r
+			self.rewards2[arm_] = self.rewards2[arm_] + r*r
+			self.costs[arm_] = self.costs[arm_] + c
 
-		self.reward = self.reward + r
-		self.cost = self.cost + c
-		self.t = self.t + 1
+			self.reward = self.reward + r
+			self.cost = self.cost + c
+			self.t = self.t + 1
+		else:
+			print ('Player {}: Budget exhausted. Action {} denied\n\tFinal remaining budget: {}'.format(self.get_id(), self.t+1, self.budget+c))
 
 	def best_arm(self):
 		return np.argmax(self.rewards / (self.pulls + 0.01))
@@ -350,8 +402,8 @@ class ucb_v(player):
 #	http://proceedings.mlr.press/v19/garivier11a/garivier11a.pdf
 # =============================================================
 class kl_ucb(player):
-	def __init__(self, num_arms, params=None):
-		super().__init__(num_arms)
+	def __init__(self, num_arms, budget, is_infinity, params=None):
+		super().__init__(num_arms, budget, is_infinity)
 		if params != None:
 			if 'c' in params:
 				self.c = params['c']
@@ -360,11 +412,7 @@ class kl_ucb(player):
 		else:
 			self.c = 0.0
 
-		self.num_arms = num_arms
-		self.rewards = np.zeros(num_arms)
-		self.kl = np.zeros(num_arms)
-		self.costs = np.zeros(num_arms)
-		self.pulls = np.zeros(num_arms)
+		self.kl = np.zeros(self.num_arms)
 		self.t = 0
 
 		self.cold_start = True
@@ -379,7 +427,10 @@ class kl_ucb(player):
 				self.kl[a_] = self.get_max_kl(a_)
 			arm_ = np.argmax(self.kl)
 
-		r, c = casino.play_arm(arm_)
+		if self.is_infinity:
+			r, c = self.play_masked_arm(casino, arm_)
+		else:
+			r, c = casino.play_arm(arm_)
 		
 		self.update(r, c, arm_)
 
@@ -408,7 +459,6 @@ class kl_ucb(player):
 					converged = True
 				q = min(1-delta, max(q-np.nan_to_num(f/df), p+delta))
 		if not converged:
-
 			print ('WARNING: kl didn\'t converged for arm {}. t = {}'.format(k, self.t))
 		return q
 
@@ -423,13 +473,13 @@ class kl_ucb(player):
 		return (q-p)/(q*(1.0-q))
 
 	# returns the first arm that founds that hasnt been played
-	def missing_arm(self):
-		for a_ in range(self.num_arms):
-			if self.pulls[a_] == 0:
-				if a_ == (self.num_arms - 1):
-					self.cold_start = False
-				return a_
-		return -1
+	# def missing_arm(self):
+	# 	for a_ in range(self.num_arms):
+	# 		if self.pulls[a_] == 0:
+	# 			if a_ == (self.num_arms - 1):
+	# 				self.cold_start = False
+	# 			return a_
+	# 	return -1
 
 	def best_arm(self):
 		return np.argmax(self.rewards / (self.pulls + 0.01))
@@ -443,6 +493,3 @@ class kl_ucb(player):
 
 	def get_id(self):
 		return 'kl-ucb'
-
-
-
