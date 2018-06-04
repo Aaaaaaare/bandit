@@ -1,0 +1,24 @@
+type_game: 	finite
+number_plays: 	1000000
+budget: 	10000
+number_arms: 	5
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	False
+type_cost: 	normal
+--Player Random has finished his turn--
+--Player Epsilon greedy has finished his turn--
+--Player soft-max has finished his turn--
+--Player ucb1 has finished his turn--
+--Player ucb-v has finished his turn--
+--Player kl-ucb has finished his turn--
+--Player RBC-I has finished his turn--
+Reward type: 	bernoulli
+Casino best reward: 	0.98935
+Best arm: 		3
+========.. Player Random ..========
+Total reward: 	23716.0
+Total cost: 	9999.92020738821
+Total plays: 	42602
+Regret: 	0.43266
+Final budget: 	0.07979

@@ -1,0 +1,127 @@
+type_game: 	finite
+number_plays: 	1000000
+budget: 	10000
+number_arms: 	5
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	False
+type_cost: 	normal
+--Player Random has finished his turn--
+--Player Epsilon greedy has finished his turn--
+--Player soft-max has finished his turn--
+--Player ucb1 has finished his turn--
+--Player ucb-v has finished his turn--
+--Player kl-ucb has finished his turn--
+--Player RBC-I has finished his turn--
+Reward type: 	bernoulli
+Casino best reward: 	0.90425
+Best arm: 		1
+========.. Player Random ..========
+Total reward: 	23688.0
+Total cost: 	9999.379799596401
+Total plays: 	49387
+Regret: 	0.42461
+Final budget: 	0.62020
+Best arm: 	4
+========.. Player Epsilon greedy ..========
+Total reward: 	30325.0
+Total cost: 	9999.834944667848
+Total plays: 	34411
+Regret: 	0.02300
+Final budget: 	0.16506
+Best arm: 	2
+========.. Player soft-max ..========
+Total reward: 	26568.0
+Total cost: 	9999.945164419945
+Total plays: 	30029
+Regret: 	0.01951
+Final budget: 	0.05484
+Best arm: 	1
+========.. Player ucb1 ..========
+Total reward: 	30469.0
+Total cost: 	9999.588806263835
+Total plays: 	34014
+Regret: 	0.00848
+Final budget: 	0.41119
+Best arm: 	0
+========.. Player ucb-v ..========
+Total reward: 	32615.0
+Total cost: 	9999.98788235751
+Total plays: 	36268
+Regret: 	0.00498
+Final budget: 	0.01212
+Best arm: 	4
+========.. Player kl-ucb ..========
+Total reward: 	33418.0
+Total cost: 	9999.95727243324
+Total plays: 	37034
+Regret: 	0.00189
+Final budget: 	0.04273
+Best arm: 	2
+========.. Player RBC-I ..========
+Total reward: 	31475.0
+Total cost: 	9999.954269178763
+Total plays: 	54066
+Regret: 	0.32210
+Final budget: 	0.04573
+Best arm: 	3
+========.. Player Random ..========
+reward 	pulls
+5664.0	9816.0
+8970.0	9976.0
+379.0	9772.0
+84.0	9966.0
+8591.0	9857.0
+========.. Player Epsilon greedy ..========
+reward 	pulls
+279.0	492.0
+25499.0	28225.0
+9.0	217.0
+1.0	234.0
+4537.0	5243.0
+========.. Player soft-max ..========
+reward 	pulls
+277.0	482.0
+15984.0	17653.0
+0.0	3.0
+0.0	2.0
+10307.0	11889.0
+========.. Player ucb1 ..========
+reward 	pulls
+135.0	218.0
+25467.0	28155.0
+0.0	25.0
+0.0	25.0
+4867.0	5591.0
+========.. Player ucb-v ..========
+reward 	pulls
+137.0	221.0
+31012.0	34259.0
+1.0	41.0
+0.0	35.0
+1465.0	1712.0
+========.. Player kl-ucb ..========
+reward 	pulls
+4.0	12.0
+32676.0	36156.0
+0.0	5.0
+0.0	5.0
+738.0	856.0
+========.. Player RBC-I ..========
+reward 	pulls
+4425.0	7477.0
+26728.0	29584.0
+60.0	1677.0
+113.0	15152.0
+149.0	176.0
+========.. Arms who got it right ..========
+Random
+Epsilon greedy
+soft-max
+ucb1
+ucb-v
+kl-ucb
+RBC-I
+========.. Players Ranking ..========
+END
+ENDED SUCCESsFULLY
