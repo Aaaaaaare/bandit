@@ -19,15 +19,17 @@ class RCB_I(player):
 
 		self.is_infi = is_infi
 
+		self.budget = budget
+
 		if is_infi:
 			self.c = 1.0
 			if self.beta < 1:
-				self.k = self.c * np.power(self.budget, self.beta/2.0)
+				self.k = int(self.c * np.power(self.budget, self.beta/2.0))
 			elif self.beta >= 1:
-				self.k = self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0))
+				self.k = int(self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0)))
 			else:
 				print ('ERROR in beta value. Working with all arms')
-				self.k = num_arms
+				self.k = int(num_arms)
 		else:
 			self.k = num_arms
 

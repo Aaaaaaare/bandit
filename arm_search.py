@@ -47,12 +47,12 @@ class alpha_I(alpha_0):
 				self.beta = params['beta']
 
 		if self.beta < 1:
-			self.num_arms = self.c * np.power(self.budget, self.beta/2.0)
+			self.num_arms = int(self.c * np.power(self.budget, self.beta/2.0))
 		elif self.beta >= 1:
-			self.num_arms = self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0))
+			self.num_arms = int(self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0)))
 		else:
 			print ('ERROR in beta value. Working with all arms')
-			self.num_arms = num_arms
+			self.num_arms = int(num_arms)
 
 		self.budget = budget
 		# upper limit of the number of arms. Should be np.e = 2.71

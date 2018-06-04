@@ -1,1 +1,0 @@
-type_game: finitenumber_plays: 5000number_arms: 4type_reward: bernoulliis_cost: Falsetype_cost: normalENDED SUCCESsFULLY

@@ -12,6 +12,13 @@ class player:
 		if is_infinity:
 			np.random.shuffle(self.all_arms)
 
+		# Total values
+		self.reward = 0.0
+		self.cost = 0.0
+		self.budget = budget
+		self.valid_budget = budget
+		self.is_infinity = is_infinity
+
 		# If it is infinity, then we pick random k arms, following
 		# the k definition in the paper of those guys
 		# If it is not infinity, then we just ignore the budget here
@@ -20,26 +27,21 @@ class player:
 		self.beta = 1.0
 		if is_infinity:
 			if self.beta < 1:
-				self.num_arms = self.c * np.power(self.budget, self.beta/2.0)
+				self.num_arms = int(self.c * np.power(self.budget, self.beta/2.0))
 			elif self.beta >= 1:
-				self.num_arms = self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0))
+				self.num_arms = int(self.c * np.power(self.budget, (self.beta)/(self.beta + 1.0)))
 			else:
 				print ('ERROR in beta value. Working with all arms')
-				self.num_arms = num_arms
+				self.num_arms = int(num_arms)
 		else:
-			self.num_arms = num_arms
+			self.num_arms =int(num_arms)
 
 		# Arrays to contain all the information for each arm
-		self.rewards = np.zeros(self.num_arms)
-		self.costs = np.zeros(self.num_arms)
-		self.pulls = np.zeros(self.num_arms)
-		# Total values
-		self.reward = 0.0
-		self.cost = 0.0
-		self.budget = budget
-		self.valid_budget = budget
+		self.rewards = np.zeros((int)(self.num_arms))
+		self.costs = np.zeros((int)(self.num_arms))
+		self.pulls = np.zeros((int)(self.num_arms))
+
 		self.t = 0
-		self.is_infinity = is_infinity
 
 
 	def play(self, casino):
@@ -51,7 +53,7 @@ class player:
 	# example: all_arms[arm=0] = 9 --> casino[arm=9]
 	def play_masked_arm(self, casino, arm_):
 		arm_masked = int(self.all_arms[arm_])
-		r, c = casino.play(arm_masked)
+		r, c = casino.play_arm(arm_masked)
 		return r, c
 
 	# Return number of arms

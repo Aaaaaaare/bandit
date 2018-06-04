@@ -1,0 +1,11 @@
+type_game: 	infinite arms, known budget
+number_plays: 	100000
+budget: 	5000
+number_arms: 	20	Deprecated
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	True
+type_cost: 	normal
+
+Testing the algoriths for the case of infinite arms and know budget
+

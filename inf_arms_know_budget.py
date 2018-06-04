@@ -36,9 +36,9 @@ def main():
     type_cost = 'normal'
     is_infinity = True
     if is_infinity:
-        number_arms_s = str(num_arms) + '\tDeprecated'
+        number_arms_s = str(number_arms) + '\tDeprecated'
     else:
-        number_arms_s = str(num_arms)
+        number_arms_s = str(number_arms)
 
     specs = {
             'type_game' : type_game,
@@ -68,13 +68,13 @@ def main():
     casino = Casino.bandit(num_arms=number_arms_, type_b='bernoulli', is_cost=is_cost, infinity=is_infinity)
 
     #========.. Create the players ..========
-    player_one = players.random_player(number_arms, budget, is_infinity)
-    player_two = players.eps_greedy_player(number_arms, budget, is_infinity)
-    player_three = players.softmax_player(number_arms, budget, is_infinity)
-    player_four = players.ucb1(number_arms, budget, is_infinity)
-    player_five = players.ucb_v(number_arms, budget, is_infinity)
-    player_six = players.kl_ucb(number_arms, budget, is_infinity)
-    pro_player_one = pro_players.RCB_I(number_arms, budget, is_infinity)
+    player_one = players.random_player(number_arms_, budget, is_infinity)
+    player_two = players.eps_greedy_player(number_arms_, budget, is_infinity)
+    player_three = players.softmax_player(number_arms_, budget, is_infinity)
+    player_four = players.ucb1(number_arms_, budget, is_infinity)
+    player_five = players.ucb_v(number_arms_, budget, is_infinity)
+    player_six = players.kl_ucb(number_arms_, budget, is_infinity)
+    pro_player_one = pro_players.RCB_I(number_arms_, budget, is_infinity)
     #pro_player_two = pro_players.RCB_AIR(number_arms, budget, is_infinity)
 
     all_players = [ player_one,
@@ -118,7 +118,7 @@ def main():
     for i, p in enumerate(all_players):
         double_print (ghost, documented, '========.. Player {} ..========'.format(p.get_id()))
         if is_infinity:
-            double_print ((ghost, documented, 'Arms played: \t{}'.format(p.get_num_arms())))
+            double_print (ghost, documented, 'Arms played: \t{}'.format(p.get_num_arms()))
         double_print (ghost, documented, 'Total reward: \t{}'.format(r[i]))
         double_print (ghost, documented, 'Total cost: \t{}'.format(c[i]))
         double_print (ghost, documented, 'Total plays: \t{}'.format(p.get_total_plays()))
@@ -126,13 +126,12 @@ def main():
         double_print (ghost, documented, 'Final budget: \t%.5f' % p.remaining_valid_budget())
         double_print (ghost, documented, 'Best arm: \t{}'.format(p.best_arm_casino()))
 
-    # casino.print_all_arms()
 
-    for i, p in enumerate(all_players):
-        double_print (ghost, documented, '========.. Player {} ..========'.format(p.get_id()))
-        double_print (ghost, documented, 'reward \tpulls')
-        for j in range(number_arms):
-            double_print (ghost, documented, '{}\t{}'.format(p.rewards[j], p.pulls[j]))
+    # for i, p in enumerate(all_players):
+    #     double_print (ghost, documented, '========.. Player {} ..========'.format(p.get_id()))
+    #     double_print (ghost, documented, 'reward \tpulls')
+    #     for j in range(number_arms):
+    #         double_print (ghost, documented, '{}\t{}'.format(p.rewards[j], p.pulls[j]))
 
 
     #========.. Arms who succedd ..========
