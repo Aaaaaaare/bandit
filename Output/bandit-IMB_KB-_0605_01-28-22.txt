@@ -1,0 +1,70 @@
+type_game: 	infinite arms, known budget
+number_plays: 	100000
+budget: 	5000
+number_arms: 	20	Deprecated
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	True
+type_cost: 	normal
+
+Testing the algoriths for the case of infinite arms and know budget
+
+--Player Random has finished his turn--
+--Player Epsilon greedy has finished his turn--
+--Player soft-max has finished his turn--
+--Player ucb1 has finished his turn--
+--Player ucb-v has finished his turn--
+--Player kl-ucb has finished his turn--
+--Player RBC-I has finished his turn--
+Reward type: 	bernoulli
+Casino best reward: 	0.99997
+Best arm: 		9396
+========.. Player Random ..========
+Arms played: 	70
+Total reward: 	3765.0
+Total cost: 	4999.454087160606
+Total plays: 	9039
+Regret: 	0.58344
+Final budget: 	0.54591
+Best arm: 	7844
+========.. Player Epsilon greedy ..========
+Arms played: 	70
+Total reward: 	5036.0
+Total cost: 	4999.63840156536
+Total plays: 	5423
+Regret: 	0.07133
+Final budget: 	0.36160
+Best arm: 	4178
+========.. Player soft-max ..========
+Arms played: 	70
+Total reward: 	9721.0
+Total cost: 	4999.541615763385
+Total plays: 	10985
+Regret: 	0.11504
+Final budget: 	0.45838
+Best arm: 	5493
+========.. Player ucb1 ..========
+Arms played: 	70
+Total reward: 	6894.0
+Total cost: 	4999.419078034118
+Total plays: 	8667
+Regret: 	0.20454
+Final budget: 	0.58092
+Best arm: 	8706
+========.. Player ucb-v ..========
+Arms played: 	70
+Total reward: 	6692.0
+Total cost: 	4999.485654435711
+Total plays: 	9301
+Regret: 	0.28048
+Final budget: 	0.51435
+Best arm: 	2865
+========.. Player kl-ucb ..========
+Arms played: 	70
+Total reward: 	11581.0
+Total cost: 	4999.6714644971125
+Total plays: 	11771
+Regret: 	0.01611
+Final budget: 	0.32854
+Best arm: 	4061
+========.. Player RBC-I ..========

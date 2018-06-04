@@ -140,8 +140,8 @@ def main():
         if p.best_arm_casino() == casino.best_arm():
             double_print (ghost, documented, p.get_id())
     double_print (ghost, documented, '========.. Players Ranking ..========')
-    for p_ in sorted(all_players, key=lambda player: player.get_prize()[0]):
-        double_print(ghost, documented, p_.get_id())
+    for p_ in sorted(all_players, key=lambda player: player.get_prize()[0], reverse=True):
+        double_print(ghost, documented, '{}\t\t{}'.format(p_.get_id(), p_.get_prize()[0]))
     #double_print (ghost, documented,  sorted(all_players, key=lambda player: player.regret(casino))[0].get_id() )
 
     #========.. Plot ..========

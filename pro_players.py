@@ -71,7 +71,7 @@ class RCB_I(player):
 	def get_number_arms_played(self):
 		return self.k
 
-	def get_num_arms():
+	def get_num_arms(self):
 		return self.k
 
 	def get_id(self):
@@ -165,7 +165,7 @@ class RCB_AIR(player):
 	def get_number_arms_played(self):
 		return self.k
 
-	def get_num_arms():
+	def get_num_arms(self):
 		return self.k
 
 	def exploration(self, t):

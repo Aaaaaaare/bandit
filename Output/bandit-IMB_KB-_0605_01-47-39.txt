@@ -1,0 +1,88 @@
+type_game: 	infinite arms, known budget
+number_plays: 	100000
+budget: 	5000
+number_arms: 	20	Deprecated
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	True
+type_cost: 	normal
+
+Testing the algoriths for the case of infinite arms and know budget
+
+--Player Random has finished his turn--
+--Player Epsilon greedy has finished his turn--
+--Player soft-max has finished his turn--
+--Player ucb1 has finished his turn--
+--Player ucb-v has finished his turn--
+--Player kl-ucb has finished his turn--
+--Player RBC-I has finished his turn--
+Reward type: 	bernoulli
+Casino best reward: 	0.99958
+Best arm: 		8966
+========.. Player Random ..========
+Arms played: 	70
+Total reward: 	4805.0
+Total cost: 	4999.294533870578
+Total plays: 	9350
+Regret: 	0.48568
+Final budget: 	0.70547
+Best arm: 	8243
+========.. Player Epsilon greedy ..========
+Arms played: 	70
+Total reward: 	11627.0
+Total cost: 	4999.799410738148
+Total plays: 	13195
+Regret: 	0.11842
+Final budget: 	0.20059
+Best arm: 	7694
+========.. Player soft-max ..========
+Arms played: 	70
+Total reward: 	8902.0
+Total cost: 	4999.575713713
+Total plays: 	9657
+Regret: 	0.07777
+Final budget: 	0.42429
+Best arm: 	1306
+========.. Player ucb1 ..========
+Arms played: 	70
+Total reward: 	8502.0
+Total cost: 	4999.782670616294
+Total plays: 	10290
+Regret: 	0.17334
+Final budget: 	0.21733
+Best arm: 	7924
+========.. Player ucb-v ..========
+Arms played: 	70
+Total reward: 	8730.0
+Total cost: 	4999.880969812163
+Total plays: 	11828
+Regret: 	0.26150
+Final budget: 	0.11903
+Best arm: 	3465
+========.. Player kl-ucb ..========
+Arms played: 	70
+Total reward: 	6107.0
+Total cost: 	4999.532992469253
+Total plays: 	6283
+Regret: 	0.02760
+Final budget: 	0.46701
+Best arm: 	8661
+========.. Player RBC-I ..========
+Arms played: 	70
+Total reward: 	12857.0
+Total cost: 	4999.8716529983185
+Total plays: 	15833
+Regret: 	0.18755
+Final budget: 	0.12835
+Best arm: 	20
+========.. Arms who got it right ..========
+========.. Players Ranking ..========
+RBC-I		
+Epsilon greedy		
+soft-max		
+ucb-v		
+ucb1		
+kl-ucb		
+Random		
+END
+ENDED SUCCESsFULLY at _0605_01-53-31
