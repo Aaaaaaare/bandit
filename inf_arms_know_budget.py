@@ -1,11 +1,14 @@
 import Casino
 import Ghostwriter
+
 import players
 import pro_players
+import arm_search
+
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pylab as pyl
-import my_players
+
 
 import numpy as np
 #reload(Casino)
@@ -16,7 +19,7 @@ def main():
 
     #========.. Create the report file ..========
     folder = './Output/'
-    test_name = 'bandit-'
+    test_name = 'bandit-IMB_KB-'
     _timestamp = datetime.now().strftime("_%m%d_%H-%M-%S")
     report_name = folder + test_name + _timestamp + '.txt'
     
@@ -24,34 +27,40 @@ def main():
         ghost = Ghostwriter.Ghostwriter(report_name)
 
     #========.. Run specs ..========
-    type_game = 'finite'
-    number_arms = 5
+    type_game = 'infinite arms, known budget'
+    number_arms = 20
     num_plays = 100000
-    budget = 1000
+    budget = 5000
     type_reward = 'bernoulli'
     is_cost = True
-    is_infinity = False
     type_cost = 'normal'
+    is_infinity = True
+    if is_infinity:
+        number_arms_s = str(num_arms) + '\tDeprecated'
+    else:
+        number_arms_s = str(num_arms)
+
     specs = {
             'type_game' : type_game,
             'number_plays' : num_plays,
             'budget' : budget,
-            'number_arms' : number_arms,
+            'number_arms' : number_arms_s,
             'type_reward' : type_reward,
             'is_cost' : is_cost,
             'is_infinity' : is_infinity,
             'type_cost' : type_cost}
     
-    speach = '\nNothing much to say for the moment. Thank you\n'
+    speech = '\nTesting the algoriths for the case of infinite arms and know budget\n'
 
     if documented:
         ghost.write_(specs)
-        ghost.write(speach)
+        ghost.write(speech)
 
     #========.. Create the bandit ..========
     # If is infinity, the number of arms is undefined... but 
-    # i will approximate it as 2 times the budget
-    # Then, each player will decide the number of arms
+    # i will approximate it as 2 times the budget for the creation 
+    # of the casino... 
+    # Then, each player will deal with the number of arms
     if is_infinity:
         number_arms_ = (int)(2 * budget)
     else:

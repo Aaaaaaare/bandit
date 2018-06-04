@@ -36,7 +36,8 @@ class arm:
             if type_b == 'uniform':
                 self.upper = np.random.rand()
             if self._cost:
-                self.cost_upper = np.random.rand()
+                self.cost_upper = np.random.uniform(0.3, 1)
+                self.cost_lower = np.random.uniform(0.1, self.cost_upper)
         
         if self.type not in types:
             raise NameError('ERROR 1: Payoff distribution not recognized')
@@ -85,6 +86,7 @@ class arm:
         elif self.type == 'normal':
             rw = np.random.normal(self.mean, self.variance)
             rw = max(0, rw)
+            rw = min(1, rw)
             return rw
 
         elif self.type == 'uniform':
@@ -94,7 +96,7 @@ class arm:
             
     def generate_cost(self):
         if self._cost:
-            return np.random.uniform(0, self.cost_upper)
+            return np.random.uniform(self.cost_lower, self.cost_upper)
         else:
             #return max(np.random.normal(self.cost_mean, self.cost_vart), 0)
             return 0
@@ -133,6 +135,7 @@ class bandit:
     def best_arm(self):
         #b_arm_ = np.argmax(self.arms.get_Expected_reward())
         # list(data[i] for i in range(len(data)-1, -1, -1)) ?????
+        # RETURNS THE INDEX OF THE BEST AMR 
         max_rew = -1
         best_arm_ = -1
         for i in range(self.num_arms):

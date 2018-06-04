@@ -6,15 +6,18 @@ class player:
 	def __init__(self, num_arms=10, budget=1, is_infinity=False):
 		# When infinity arms are present, the idea is to play
 		# with random arms. So we need random indexes.
+		# The num_arms in the infinite context is an upper limit, just
+		# for simulation.
 		self.all_arms = np.arange(num_arms)
-		
 		if is_infinity:
 			np.random.shuffle(self.all_arms)
 
 		# If it is infinity, then we pick random k arms, following
 		# the k definition in the paper of those guys
+		# If it is not infinity, then we just ignore the budget here
+		# and pick as many arms as indicated
 		self.c = 1.0
-		self.beta = 1
+		self.beta = 1.0
 		if is_infinity:
 			if self.beta < 1:
 				self.num_arms = self.c * np.power(self.budget, self.beta/2.0)
@@ -26,10 +29,11 @@ class player:
 		else:
 			self.num_arms = num_arms
 
-		#self.all_arms = np.zeros(num_arms)
+		# Arrays to contain all the information for each arm
 		self.rewards = np.zeros(self.num_arms)
 		self.costs = np.zeros(self.num_arms)
 		self.pulls = np.zeros(self.num_arms)
+		# Total values
 		self.reward = 0.0
 		self.cost = 0.0
 		self.budget = budget
@@ -40,25 +44,32 @@ class player:
 
 	def play(self, casino):
 		#Do nothing
-		self.reward = self.reward + 0.0
-		self.cost = self.cost + 0.0
-		self.t = self.t + 1
+		raise NotImplementedError("Each player should implement this")
 
+	# Do the maping for the random selection of the arms in the casino
+	# The all_arms array has the mapping:
+	# example: all_arms[arm=0] = 9 --> casino[arm=9]
 	def play_masked_arm(self, casino, arm_):
-		arm_masked = self.all_arms[arm_]
+		arm_masked = int(self.all_arms[arm_])
 		r, c = casino.play(arm_masked)
 		return r, c
 
+	# Return number of arms
 	def get_num_arms(self):
 		return self.num_arms
 
+	# Return the total reward and the total cost
 	def get_prize(self):
 		return self.reward, self.cost
 
+	# Return the regret
 	def regret(self, casino):
 		best_arm_reward = casino.get_best_expected_reward()
 		return (best_arm_reward - (self.get_prize()[0]*1.0)/(1.0*self.t))
 
+	# In the infinite scenario, returns the local regret: considering the
+	# maximal of the arms chosen, not the best arm in the casino (that might not 
+	# have been chosen)
 	def local_regret(self, casino):
 		best_local_arm_reward = -10
 		for j in self.num_arms:
@@ -69,6 +80,8 @@ class player:
 
 		return (best_local_arm_reward - (self.get_prize()[0]*1.0)/(1.0*self.t))
 
+	# Must be called after each play.
+	# It updates all.
 	def update(self, r, c, arm_):
 		
 		self.budget = self.budget - c
@@ -85,26 +98,35 @@ class player:
 		else:
 			print ('Player {}: Budget exhausted. Action {} denied\n\tFinal remaining budget: {}'.format(self.get_id(), self.t+1, self.budget+c))
 
+	# Manage budget
 	def remaining_budget(self):
 		return self.budget
 
+	# Manage budget
 	def remaining_valid_budget(self):
 		return self.valid_budget
 
+	# Returns the empirical best arm detected
 	def best_arm(self):
 		return np.argmax(self.rewards/(self.pulls + 0.01))
 
+	# Returns the empirical best arm, as indexed in the casino
 	def best_arm_casino(self):
 		j = (int)(self.best_arm())
 		return self.all_arms[j]
 
+	# Returns how many plays have been performed.
+	# Must equals sum(self.pulls)
 	def get_total_plays(self):
 		return self.t
 
+	# Identifier. Each class has its own implementation
 	def get_id(self):
 		return 'Generic'
 
 	# returns the first arm that founds that hasnt been played
+	# TODO: improve implementation following the implementation in
+	# the kl_ucb_alpha
 	def missing_arm(self):
 		for a_ in range(self.num_arms):
 			if self.pulls[a_] == 0:
@@ -114,12 +136,10 @@ class player:
 		return -1
 
 
-
 # =============================================================
 #	Agent that plays random
 #
 # =============================================================
-
 class random_player(player):
 	def __init__(self, num_arms, budget, is_infinity):
 		super().__init__(num_arms, budget, is_infinity)
@@ -142,7 +162,6 @@ class random_player(player):
 #	Agent that plays with epsilon greedy policy
 #
 # =============================================================
-
 class eps_greedy_player(player):
 	def __init__(self, num_arms, budget, is_infinity, params=None):
 		super().__init__(num_arms, budget, is_infinity)
@@ -172,9 +191,6 @@ class eps_greedy_player(player):
 			r, c = casino.play_arm(arm_)
 
 		self.update(r, c, arm_)
-
-	def best_arm(self):
-		return np.argmax(self.rewards / (self.pulls + 0.01))
 
 	def estimated_payout(self):
 		return self.rewards/(self.pulls+0.01)
@@ -236,10 +252,6 @@ class softmax_player(player):
 
 		self.update(r, c, arm_)
 
-
-	def best_arm(self):
-		return np.argmax(self.rewards / (self.pulls + 0.01))
-
 	def estimated_payout(self):
 		return self.rewards/(self.pulls+0.01)
 
@@ -256,7 +268,6 @@ class softmax_player(player):
 #	Agent that plays with UCB policy
 #
 # =============================================================
-
 class ucb1(player):
 	def __init__(self, num_arms, budget, is_infinity, params=None):
 		super().__init__(num_arms, budget, is_infinity)
@@ -265,14 +276,18 @@ class ucb1(player):
 				self.epsilon = params['epsilon']
 			else:
 				self.epsilon = 0.1
+		else:
+			self.epsilon = 0.1
+
+		if params != None:
 			if 'cold_start' in params:
 				self.cold_start = params['cold_start']
 			else:
 				self.cold_start = True
 		else:
-			self.epsilon = 0.1
 			self.cold_start = True
 
+		# To improve approximation and to avoid division by 0
 		if self.cold_start:
 			self.varepsilon = 0.0
 		else:
@@ -318,24 +333,22 @@ class ucb1(player):
 class ucb_v(player):
 	def __init__(self, num_arms, budget, is_infinity, params=None):
 		super().__init__(num_arms, budget, is_infinity)
+
+		# Initial parameter values
+		self.zeta = 1.2
+		self.c = 1.0
+		self.b = 1.0
+
+		# If specified, override
 		if params != None:
 			if 'zeta' in params:
 				self.zeta = params['zeta']
-			else:
-				self.zeta = 1.2
 			if 'c' in params:
 				self.c = params['c']
-			else:
-				self.c = 1
 			if 'b' in params:
 				self.b = params['b']
-			else:
-				self.b = 1
-		else:
-			self.zeta = 1.2
-			self.c = 1
-			self.b = 1
 
+		# To carry the cuadratic value of the rewards
 		self.rewards2 = np.zeros(self.num_arms)
 		self.cold_start = True
 		self.t = 0
@@ -349,7 +362,7 @@ class ucb_v(player):
 			x_barr = self.rewards / (self.pulls)
 			variance = self.rewards2/(self.pulls) - ( self.rewards*self.rewards/(self.pulls*self.pulls) )
 			
-			ucbv_ = x_barr + np.sqrt(2*variance*np.log(self.t)/self.pulls) + 3*self.c*self.b*np.log(self.t)/self.pulls
+			ucbv_ = x_barr + np.sqrt(2*variance*np.log(self.t)/self.pulls) + 3.0*self.c*self.b*np.log(self.t)/self.pulls
 			arm_ = np.argmax(ucbv_)
 
 		if self.is_infinity:
@@ -359,15 +372,8 @@ class ucb_v(player):
 
 		self.update_all(r, c, arm_)
 
-	# returns the first arm that founds that hasnt been played
-	# def missing_arm(self):
-	# 	for a_ in range(self.num_arms):
-	# 		if self.pulls[a_] == 0:
-	# 			if a_ == (self.num_arms - 1):
-	# 				self.cold_start = False
-	# 			return a_
-	# 	return -1
-
+	# Overriding the generic update_all method to 
+	# update the array of quadratic values
 	def update_all(self, r, c, arm_):
 		self.budget = self.budget - c 
 		if self.budget >= 0:
@@ -404,14 +410,16 @@ class ucb_v(player):
 class kl_ucb(player):
 	def __init__(self, num_arms, budget, is_infinity, params=None):
 		super().__init__(num_arms, budget, is_infinity)
+
+		# algorithm parameter. The authors say c=0 is recomended
+		self.c = 0.0
+
+		# if specified, override
 		if params != None:
 			if 'c' in params:
 				self.c = params['c']
-			else:
-				self.c = 0.0
-		else:
-			self.c = 0.0
-
+		
+		# Algorithm array to simplifythe coding	
 		self.kl = np.zeros(self.num_arms)
 		self.t = 0
 
@@ -480,9 +488,6 @@ class kl_ucb(player):
 	# 				self.cold_start = False
 	# 			return a_
 	# 	return -1
-
-	def best_arm(self):
-		return np.argmax(self.rewards / (self.pulls + 0.01))
 
 	def estimated_payout(self):
 		return self.rewards/(self.pulls+0.01)
