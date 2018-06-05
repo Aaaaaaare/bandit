@@ -30,7 +30,7 @@ def main():
     type_game = 'infinite arms, known budget'
     number_arms = 20
     num_plays = 100000
-    budget = 5000
+    budget = 500
     type_reward = 'bernoulli'
     is_cost = True
     type_cost = 'normal'
@@ -102,6 +102,7 @@ def main():
     #=======.. Print the result ..========
     #=======.. Casino info ..========
     double_print (ghost, documented, 'Reward type: \t{}'.format(casino.get_type_b()))
+    double_print (ghost, documented, 'Casino number of arms: \t\t{}'.format(casino.get_number_arms()))
     double_print (ghost, documented, 'Casino best reward: \t%.5f' % casino.best_arm_reward())
     double_print (ghost, documented, 'Best arm: \t\t{}'.format(casino.best_arm()))
 

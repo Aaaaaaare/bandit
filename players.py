@@ -141,7 +141,7 @@ class player:
 		return -1
 
 	def best_arm_reward(self):
-		return max(self.rewards/(self.costs + 0.01))
+		return max(self.rewards/(self.costs))
 
 
 # =============================================================

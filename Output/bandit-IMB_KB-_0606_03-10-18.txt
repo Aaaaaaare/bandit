@@ -1,0 +1,86 @@
+type_game: 	infinite arms, known budget
+number_plays: 	100000
+budget: 	500
+number_arms: 	20	Deprecated
+type_reward: 	bernoulli
+is_cost: 	True
+is_infinity: 	True
+type_cost: 	normal
+
+Testing the algoriths for the case of infinite arms and know budget
+My algorithm, alpha-I and the RCB-I algorithm
+
+--Player Random has finished his turn--
+--Player RBC-I has finished his turn--
+--Player alpha-I has finished his turn--
+Reward type: 	bernoulli
+Casino number of arms: 		1000
+Casino best reward: 	0.99888
+Best arm: 		234
+========.. Player Random ..========
+Arms played: 	22
+Total reward: 	713.0
+Total cost: 	499.9500604660887
+Total plays: 	1124
+Final budget: 	0.04994
+Best arm reward: 	3.556914469810796
+========.. Player RBC-I ..========
+Arms played: 	22
+Total reward: 	673.0
+Total cost: 	499.78034452448276
+Total plays: 	1278
+Final budget: 	0.21966
+Best arm reward: 	2.332789037311135
+========.. Player alpha-I ..========
+Arms played: 	22
+Total reward: 	1015.0
+Total cost: 	500.1031739166782
+Total plays: 	1108
+Final budget: 	0.41962
+Best arm reward: 	2.2921149682800257
+========.. Player Random ..========
+reward 	pulls
+6.0	60.0
+48.0	68.0
+39.0	53.0
+39.0	51.0
+49.0	55.0
+41.0	56.0
+64.0	64.0
+4.0	43.0
+19.0	53.0
+54.0	55.0
+32.0	44.0
+24.0	40.0
+36.0	52.0
+47.0	49.0
+13.0	52.0
+59.0	63.0
+19.0	41.0
+12.0	42.0
+15.0	38.0
+22.0	57.0
+========.. Player RBC-I ..========
+reward 	pulls
+9.0	17.0
+59.0	178.0
+10.0	144.0
+96.0	96.0
+14.0	24.0
+17.0	18.0
+18.0	25.0
+37.0	67.0
+116.0	190.0
+24.0	31.0
+26.0	41.0
+76.0	108.0
+7.0	9.0
+14.0	20.0
+4.0	12.0
+11.0	14.0
+12.0	14.0
+6.0	25.0
+14.0	18.0
+15.0	20.0
+========.. Player alpha-I ..========
+reward 	pulls

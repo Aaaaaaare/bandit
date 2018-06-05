@@ -82,7 +82,7 @@ class kl_ucb_alpha(kl_ucb):
 
 	def is_new_arm_better(self):
 		# If the last one beats all
-		np.argmax(self.reward/self.costs) == self.num_arms - 1
+		np.argmax(self.real_rewards/self.real_costs) == (self.num_arms - 1)
 
 	def get_id(self):
 		return 'kl-ucb-alpha'
@@ -103,7 +103,7 @@ class kl_ucb_alpha(kl_ucb):
 	def set_budget(self, val):
 		self.budget = val
 
-	def get_prize():
+	def get_prize(self):
 		return self.real_reward, self.real_cost
 
 
@@ -149,7 +149,7 @@ class ucb_alpha(ucb1):
 
 		# This will always be False
 		if self.is_infinity:
-			print ('MISTAAAAAAAAAAAAAAAAAAAAAAAAKE')
+			print ('MISTAKE')
 			r, c = self.play_masked_arm(casino, arm_)
 		else:
 			r, c = casino.play_arm(arm_)
@@ -184,7 +184,7 @@ class ucb_alpha(ucb1):
 
 	def is_new_arm_better(self):
 		# If the last one beats all
-		np.argmax(self.reward/self.costs) == self.num_arms - 1
+		np.argmax(self.real_rewards/self.real_costs) == self.num_arms - 1
 
 	def get_id(self):
 		return 'kl-ucb-alpha'
@@ -205,5 +205,5 @@ class ucb_alpha(ucb1):
 	def set_budget(self, val):
 		self.budget = val
 
-	def get_prize():
+	def get_prize(self):
 		return self.real_reward, self.real_cost

@@ -17,8 +17,8 @@ class alpha_0:
 		return self.num_arms
 
 	def get_prize(self):
-		# return self.gambler.get_prize()
-		return self.gambler.real_reward, self.gambler.real_cost
+		return self.gambler.get_prize()
+		#return self.gambler.real_reward, self.gambler.real_cost
 
 	def get_budget_used(self):
 		return self.gambler.real_cost
@@ -41,7 +41,7 @@ class alpha_0:
 		return self.gambler.valid_budget
 
 	def best_arm_reward(self):
-		return max(self.gambler.real_rewards/(self.gambler.real_costs + 0.01))
+		return max(self.gambler.real_rewards/(self.gambler.real_costs))
 
 # =====================================================
 # Budget know.
@@ -73,16 +73,19 @@ class alpha_I(alpha_0):
 			self.num_arms = int(num_arms)
 		
 		# upper limit of the number of arms. Should be np.e = 2.71
-		self.max_num_arms = 3*self.num_arms
+		self.max_num_arms = np.e*self.num_arms
 
 		# At the beginining, we dont add arms.
 		# We play with the ones we have
 		self.new_arm = False
 		self.initial_run = True
 
+		kl = False
 		# create my gambler. It is Blind to the infinity of the arms
-		#self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
-		self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		if kl:
+			self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		else:
+			self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 
 	def play(self, casino):
 

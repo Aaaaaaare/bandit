@@ -122,6 +122,9 @@ class bandit:
     def get_type_b(self):
         return self.type_b
 
+    def get_number_arms(self):
+        return self.num_arms
+
     def play_arm(self, index):
         self.t = self.t + 1
         return self.arms[index].play()
