@@ -1,5 +1,7 @@
 import pro_players
-from my_players import kl_ucb_alpha
+from my_players import kl_ucb_alpha, ucb_alpha
+
+import numpy as np
 
 # ======================================================
 # Generic class
@@ -34,6 +36,10 @@ class alpha_0:
 	def remaining_budget(self):
 		return self.gambler.remaining_budget()
 
+	# Manage budget
+	def remaining_valid_budget(self):
+		return self.gambler.valid_budget
+
 	def best_arm_reward(self):
 		return max(self.gambler.rewards/(self.gambler.costs + 0.01))
 
@@ -49,6 +55,9 @@ class alpha_I(alpha_0):
 		
 		# algorithm parameter
 		self.beta = 1.0
+		self.c = 1
+
+		self.budget = budget
 
 		# If speficied, override
 		if params != None:
@@ -62,19 +71,18 @@ class alpha_I(alpha_0):
 		else:
 			print ('ERROR in beta value. Working with all arms')
 			self.num_arms = int(num_arms)
-
-		self.budget = budget
+		
 		# upper limit of the number of arms. Should be np.e = 2.71
 		self.max_num_arms = 3*self.num_arms
 
 		# At the beginining, we dont add arms.
 		# We play with the ones we have
-		self.add_arm = False
+		self.new_arm = False
 		self.initial_run = True
 
 		# create my gambler. It is Blind to the infinity of the arms
-		self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget, 
-			is_infinity = False)
+		# self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 
 	def play(self, casino):
 
@@ -83,14 +91,14 @@ class alpha_I(alpha_0):
 			self.gambler.play(casino)
 			if not self.gambler.is_an_arm_missing():
 				self.initial_run = False
-				self.add_arm = True
+				self.new_arm = True
 
 		# We need to add an arm if all arms have been played... (**)
 		else:
 			# If a arm needs to be added, we add it.
 			# then, the gambler's play function will play it
 			# because it will have 0 pulls
-			if self.add_arm:
+			if self.new_arm:
 				#self.gambler.add_arm()
 				#self.num_arms = self.num_arms + 1
 				self.add_arm()
@@ -98,11 +106,11 @@ class alpha_I(alpha_0):
 			self.gambler.play(casino)
 			# (**)...and if we haven'f find a better arm of the rest yet.
 			# Also, there is a top number of arms, 3*num_arms_initial
-			if self.add_arm:
+			if self.new_arm:
 				if self.gambler.is_new_arm_better():
-					self.add_arm = False
+					self.new_arm = False
 				if self.num_arms >= self.max_num_arms:
-					self.add_arm = False
+					self.new_arm = False
 
 	def get_id(self):
 		return 'alpha-I'
@@ -144,7 +152,7 @@ class alpha_II(alpha_0):
 
 		# At the beginining, we dont add arms.
 		# We play with the ones we have
-		self.add_arm = False
+		self.new_arm = False
 		self.initial_run = True
 		self.counter = self.num_arms
 

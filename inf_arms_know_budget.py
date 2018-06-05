@@ -151,7 +151,7 @@ def main():
     plt.legend()
     plt.grid(True)
     plt.xlabel('time')
-    plt.ylabel('regret')
+    plt.ylabel('reward')
     plt.savefig(report_name[:-4] + '.png')
     plt.show()
 

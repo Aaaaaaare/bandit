@@ -30,7 +30,7 @@ def main():
     type_game = 'infinite arms, known budget'
     number_arms = 20
     num_plays = 100000
-    budget = 5000
+    budget = 3000
     type_reward = 'bernoulli'
     is_cost = True
     type_cost = 'normal'
@@ -71,7 +71,7 @@ def main():
     #========.. Create the players ..========
     player_one = players.random_player(number_arms_, budget, is_infinity)
     pro_player_one = pro_players.RCB_I(number_arms_, budget, is_infinity)
-    pro_player_two = arm_search.alpha_I(budget, is_infinity)
+    pro_player_two = arm_search.alpha_I(budget, {'is_infinity': True})
 
     all_players = [ player_one,
                     pro_player_one,
@@ -94,8 +94,10 @@ def main():
                 double_print (ghost, documented, '--Player {} has finished his turn--'.format(p.get_id()))
                 break
             if (j % scale) == 0:
-                plotting_info[i, (int)(j/scale)] = p.regret(casino)
+                plotting_info[i, (int)(j/scale)] = p.get_prize()[0]
                 indexes[i] = (int)(indexes[i]+1)
+            if j % 500 == 0:
+                print ('going {}'.format(j))
         r[i], c[i] = p.get_prize()
     
 
@@ -115,7 +117,7 @@ def main():
         double_print (ghost, documented, 'Total cost: \t{}'.format(c[i]))
         double_print (ghost, documented, 'Total plays: \t{}'.format(p.get_total_plays()))
         double_print (ghost, documented, 'Final budget: \t%.5f' % p.remaining_valid_budget())
-        double_print (ghost, documented, 'Best arm: \t{}'.format(p.best_arm_casino()))
+        # double_print (ghost, documented, 'Best arm: \t{}'.format(p.best_arm_casino()))
         double_print (ghost, documented, 'Best arm reward: \t{}'.format(p.best_arm_reward()))
 
     # for i, p in enumerate(all_players):
@@ -126,10 +128,10 @@ def main():
 
 
     #========.. Arms who succedd ..========
-    double_print (ghost, documented, '========.. Arms who got it right ..========')
-    for p in all_players:
-        if p.best_arm_casino() == casino.best_arm():
-            double_print (ghost, documented, p.get_id())
+    # double_print (ghost, documented, '========.. Arms who got it right ..========')
+    # for p in all_players:
+    #     if p.best_arm_casino() == casino.best_arm():
+    #         double_print (ghost, documented, p.get_id())
     double_print (ghost, documented, '========.. Players Ranking ..========')
     for p_ in sorted(all_players, key=lambda player: player.get_prize()[0], reverse=True):
         double_print(ghost, documented, '{}\t\t{}'.format(p_.get_id(), p_.get_prize()[0]))
