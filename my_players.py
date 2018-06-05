@@ -22,6 +22,9 @@ class kl_ucb_alpha(kl_ucb):
 		self.real_reward = 0
 		self.real_cost = 0
 
+		self.real_rewards = np.zeros(num_arms)
+		self.real_costs = np.zeros(num_arms)
+
 		# To handle cold start of newly added arms
 		# queue has the index of the arms with 0 pulls
 		self.queue = np.where(self.pulls == 0)[0]
@@ -49,7 +52,12 @@ class kl_ucb_alpha(kl_ucb):
 		# a modification of the reward.
 		self.real_reward += r
 		self.real_cost += c
-		r_plus = ((self.a *r - self.b * c) + self.b )/(self.a + self.b)
+		self.real_rewards[arm_] += r
+		self.real_costs[arm_] += c
+		
+		# r_plus = 2 * np.arctan(r/c) / np.pi
+		e_x = np.exp(r/c)
+		r_plus = e_x/(e_x + 1)
 
 		self.update(r_plus, c, arm_)
 
@@ -62,6 +70,9 @@ class kl_ucb_alpha(kl_ucb):
 		self.pulls = np.append(self.pulls, 0)
 
 		self.kl = np.append(self.kl, 0.0)
+
+		self.real_rewards = np.append(self.real_rewards, 0.0)
+		self.real_costs = np.append(self.real_costs, 0.0)
 
 		# We will need to play it,
 		# so we add it to the queue
@@ -96,10 +107,6 @@ class kl_ucb_alpha(kl_ucb):
 		return self.real_reward, self.real_cost
 
 
-
-
-
-
 # =====================================================
 #
 # The ucb1 algorith with a modification for the cost
@@ -115,8 +122,10 @@ class ucb_alpha(ucb1):
 
 		# For the new reward management.
 		self.a = 1.0
-		self.b = 1.0
+		self.b = 2.0
 
+		self.real_rewards = np.zeros(num_arms)
+		self.real_costs = np.zeros(num_arms)
 		self.real_reward = 0
 		self.real_cost = 0
 
@@ -149,7 +158,10 @@ class ucb_alpha(ucb1):
 		# a modification of the reward.
 		self.real_reward += r
 		self.real_cost += c
-		r_plus = ((self.a *r - self.b * c) + self.b )/(self.a + self.b)
+		self.real_rewards[arm_] += r
+		self.real_costs[arm_] += c
+		#r_plus = ((self.a *r - self.b * c) + self.b )/(self.a + self.b)
+		r_plus = r / c
 
 		self.update(r_plus, c, arm_)
 
@@ -160,6 +172,9 @@ class ucb_alpha(ucb1):
 		self.rewards = np.append(self.rewards, 0.0)
 		self.costs = np.append(self.costs, 0.0)
 		self.pulls = np.append(self.pulls, 0)
+
+		self.real_rewards = np.append(self.real_rewards, 0.0)
+		self.real_costs = np.append(self.real_costs, 0.0)
 
 		# We will need to play it,
 		# so we add it to the queue

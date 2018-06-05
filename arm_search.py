@@ -41,7 +41,7 @@ class alpha_0:
 		return self.gambler.valid_budget
 
 	def best_arm_reward(self):
-		return max(self.gambler.rewards/(self.gambler.costs + 0.01))
+		return max(self.gambler.real_rewards/(self.gambler.real_costs + 0.01))
 
 # =====================================================
 # Budget know.
@@ -55,7 +55,7 @@ class alpha_I(alpha_0):
 		
 		# algorithm parameter
 		self.beta = 1.0
-		self.c = 1
+		self.c = 0.37
 
 		self.budget = budget
 
@@ -81,7 +81,7 @@ class alpha_I(alpha_0):
 		self.initial_run = True
 
 		# create my gambler. It is Blind to the infinity of the arms
-		# self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		#self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 		self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 
 	def play(self, casino):

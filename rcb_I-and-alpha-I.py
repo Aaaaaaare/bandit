@@ -30,7 +30,7 @@ def main():
     type_game = 'infinite arms, known budget'
     number_arms = 20
     num_plays = 100000
-    budget = 3000
+    budget = 5000
     type_reward = 'bernoulli'
     is_cost = True
     type_cost = 'normal'
@@ -96,8 +96,6 @@ def main():
             if (j % scale) == 0:
                 plotting_info[i, (int)(j/scale)] = p.get_prize()[0]
                 indexes[i] = (int)(indexes[i]+1)
-            if j % 500 == 0:
-                print ('going {}'.format(j))
         r[i], c[i] = p.get_prize()
     
 
@@ -144,7 +142,7 @@ def main():
     plt.legend()
     plt.grid(True)
     plt.xlabel('time')
-    plt.ylabel('regret')
+    plt.ylabel('reward')
     plt.savefig(report_name[:-4] + '.png')
     plt.show()
 
