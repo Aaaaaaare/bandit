@@ -11,12 +11,15 @@ class alpha_0:
 		self.gambler = None
 		self.num_arms = 1
 
-
 	def get_num_arms(self):
 		return self.num_arms
 
 	def get_prize(self):
+		# return self.gambler.get_prize()
 		return self.gambler.real_reward, self.gambler.real_cost
+
+	def get_budget_used(self):
+		return self.gambler.real_cost
 
 	def best_arm(self):
 		return np.argmax(self.gambler.rewards/(self.gambler.costs))
@@ -27,6 +30,12 @@ class alpha_0:
 	def add_arm(self):
 		self.gambler.add_arm()
 		self.num_arms = self.num_arms + 1
+
+	def remaining_budget(self):
+		return self.gambler.remaining_budget()
+
+	def best_arm_reward(self):
+		return max(self.gambler.rewards/(self.gambler.costs + 0.01))
 
 # =====================================================
 # Budget know.
@@ -105,7 +114,7 @@ class alpha_I(alpha_0):
 # Infinite arms - Unknown.
 # =====================================================
 class alpha_II(alpha_0):
-	def __init__(self, params=None):
+	def __init__(self, num_arms, params=None):
 		super().__init__()
 		# The number of arms is indefined. The budget is undefined...
 
@@ -124,6 +133,7 @@ class alpha_II(alpha_0):
 		self.budget = 10
 
 		# Hand-picked maximum
+		# self.max_num_arms = num_arms
 		self.max_num_arms = 1e8
 
 		# Positivity factor

@@ -126,6 +126,9 @@ class player:
 	def get_id(self):
 		return 'Generic'
 
+	def get_budget_used(self):
+		return self.cost
+
 	# returns the first arm that founds that hasnt been played
 	# TODO: improve implementation following the implementation in
 	# the kl_ucb_alpha
@@ -136,6 +139,9 @@ class player:
 					self.cold_start = False
 				return a_
 		return -1
+
+	def best_arm_reward(self):
+		return max(self.rewards/(self.costs + 0.01))
 
 
 # =============================================================

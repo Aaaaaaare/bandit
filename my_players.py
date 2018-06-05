@@ -91,3 +91,6 @@ class kl_ucb_alpha(kl_ucb):
 
 	def set_budget(self, val):
 		self.budget = val
+
+	def get_prize():
+		return self.real_reward, self.real_cost
