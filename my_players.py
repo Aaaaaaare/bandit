@@ -82,7 +82,7 @@ class kl_ucb_alpha(kl_ucb):
 
 	def is_new_arm_better(self):
 		# If the last one beats all
-		np.argmax(self.real_rewards/self.real_costs) == (self.num_arms - 1)
+		return np.argmax(self.real_rewards/self.real_costs) == (self.num_arms - 1)
 
 	def get_id(self):
 		return 'kl-ucb-alpha'
@@ -184,7 +184,8 @@ class ucb_alpha(ucb1):
 
 	def is_new_arm_better(self):
 		# If the last one beats all
-		np.argmax(self.real_rewards/self.real_costs) == self.num_arms - 1
+		return np.argmax(self.real_rewards/self.real_costs) == (self.num_arms - 1)
+		#np.argmax(self.real_rewards/self.real_costs) == (len(self.real_rewards) - 1)
 
 	def get_id(self):
 		return 'kl-ucb-alpha'

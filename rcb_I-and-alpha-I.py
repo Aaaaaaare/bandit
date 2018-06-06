@@ -30,7 +30,7 @@ def main():
     type_game = 'infinite arms, known budget'
     number_arms = 20
     num_plays = 100000
-    budget = 500
+    budget = 3000
     type_reward = 'bernoulli'
     is_cost = True
     type_cost = 'normal'
@@ -116,7 +116,6 @@ def main():
         double_print (ghost, documented, 'Total cost: \t{}'.format(c[i]))
         double_print (ghost, documented, 'Total plays: \t{}'.format(p.get_total_plays()))
         double_print (ghost, documented, 'Final budget: \t%.5f' % p.remaining_valid_budget())
-        # double_print (ghost, documented, 'Best arm: \t{}'.format(p.best_arm_casino()))
         double_print (ghost, documented, 'Best arm reward: \t{}'.format(p.best_arm_reward()))
 
     # for i, p in enumerate(all_players):
