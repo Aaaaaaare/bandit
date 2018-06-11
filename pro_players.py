@@ -75,7 +75,7 @@ class RCB_I(player):
 		return self.k
 
 	def get_id(self):
-		return 'RBC-I'
+		return 'RCB-I'
 
 
 # =============================================================
@@ -128,11 +128,11 @@ class RCB_AIR(player):
 			# To not overflow:
 			if self.k < self.num_arms_total:
 				# Index one more arm
-				self.k = self.k + 1
+				self.k = int(self.k + 1)
 
 			# Play the newly added arm
 			# -1 because the indexes.. 
-			arm_ = 	(self.k - 1)
+			arm_ = 	int(self.k - 1)
 
 		# If no arm needs to be added: Run the normal algorithm in the remaining arms
 		elif True:
@@ -143,7 +143,7 @@ class RCB_AIR(player):
 			c_bar = c_bar - confidence_i
 
 			numerator_ = np.array([ min(r_bar_, 1) for r_bar_ in r_bar])
-			denominator_ = np.array([ max(c_bar_, 0) for c_bar_ in c_bar ])
+			denominator_ = np.array([ max(c_bar_, 1e-12) for c_bar_ in c_bar ])
 			d = np.nan_to_num(numerator_/denominator_)
 
 			arm_ = np.argmax(d)
@@ -173,4 +173,4 @@ class RCB_AIR(player):
 		return np.log(t)
 
 	def get_id(self):
-		return 'RBC-AIR'
+		return 'RCB-AIR'

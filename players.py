@@ -9,7 +9,8 @@ class player:
 		# The num_arms in the infinite context is an upper limit, just
 		# for simulation.
 		self.all_arms = np.arange(num_arms)
-		if is_infinity:
+		self.shuffle = False
+		if self.shuffle:
 			np.random.shuffle(self.all_arms)
 
 		# Total values
@@ -141,8 +142,15 @@ class player:
 		return -1
 
 	def best_arm_reward(self):
-		return max(self.rewards/(self.costs))
+		return max(self.rewards/(self.costs + 1e-8))
 
+	def best_arm_info(self):
+		i = np.argmax(self.rewards/(self.costs + 1e-8))
+		r = self.rewards[i]/self.pulls[i]
+		c = self.costs[i]/self.pulls[i]
+		p = self.pulls[i]
+
+		return {'index': i, 'reward': r, 'cost': c, 'pulls': p}
 
 # =============================================================
 #	Agent that plays random
@@ -474,8 +482,8 @@ class kl_ucb(player):
 				if f*f < eps:
 					converged = True
 				q = min(1-delta, max(q-np.nan_to_num(f/df), p+delta))
-		if not converged:
-			print ('WARNING: kl didn\'t converged for arm {}. t = {}'.format(k, self.t))
+		#if not converged:
+			#print ('WARNING: kl didn\'t converged for arm {}. t = {}'.format(k, self.t))
 		return q
 
 	#computes the kl divergence

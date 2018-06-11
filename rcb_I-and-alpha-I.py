@@ -15,7 +15,7 @@ import numpy as np
 
 def main():
 
-    documented = True
+    documented = False
 
     #========.. Create the report file ..========
     folder = './Output/'
@@ -25,12 +25,14 @@ def main():
     
     if documented:
         ghost = Ghostwriter.Ghostwriter(report_name)
+    else:
+        ghost = None
 
     #========.. Run specs ..========
     type_game = 'infinite arms, known budget'
     number_arms = 20
-    num_plays = 100000
-    budget = 3000
+    num_plays = 1000000
+    budget = 5000
     type_reward = 'bernoulli'
     is_cost = True
     type_cost = 'normal'
@@ -71,11 +73,15 @@ def main():
     #========.. Create the players ..========
     player_one = players.random_player(number_arms_, budget, is_infinity)
     pro_player_one = pro_players.RCB_I(number_arms_, budget, is_infinity)
-    pro_player_two = arm_search.alpha_I(budget, {'is_infinity': True})
+    pro_player_two = arm_search.alpha_I(budget, {'is_infinity': True, 'gambler': 'ucb1'})
+    pro_player_three = arm_search.alpha_I(budget, {'is_infinity': True, 'gambler': 'rcb'})
+    pro_player_four = arm_search.alpha_I(budget, {'is_infinity': True, 'gambler': 'kl'})
 
     all_players = [ player_one,
                     pro_player_one,
-                    pro_player_two ]
+                    pro_player_two,
+                    pro_player_three,
+                    pro_player_four ]
 
     r = np.zeros(len(all_players))
     c = np.zeros(len(all_players))
@@ -110,8 +116,7 @@ def main():
     #=======.. Results ..========
     for i, p in enumerate(all_players):
         double_print (ghost, documented, '========.. Player {} ..========'.format(p.get_id()))
-        if is_infinity:
-            double_print (ghost, documented, 'Arms played: \t{}'.format(p.get_num_arms()))
+        double_print (ghost, documented, 'Arms played: \t{}'.format(p.get_num_arms()))
         double_print (ghost, documented, 'Total reward: \t{}'.format(r[i]))
         double_print (ghost, documented, 'Total cost: \t{}'.format(c[i]))
         double_print (ghost, documented, 'Total plays: \t{}'.format(p.get_total_plays()))
@@ -135,13 +140,24 @@ def main():
         double_print(ghost, documented, '{}\t\t{}'.format(p_.get_id(), p_.get_prize()[0]))
     #double_print (ghost, documented,  sorted(all_players, key=lambda player: player.regret(casino))[0].get_id() )
 
+    double_print (ghost, documented, '========.. Best Arms Information ..========')
+    double_print (ghost, documented, 'id\t\tindex\trew\tcost\tpulls')
+    for j, p in enumerate(all_players):
+        dic_infor = p.best_arm_info()
+        i1 = dic_infor['index']
+        r1 = dic_infor['reward']
+        c1 = dic_infor['cost']
+        p1 = dic_infor['pulls']
+        double_print (ghost, documented, '{}\t\t{}'.format(p.get_id()[:8], i1) + '\t%.5f\t%.5f\t%.i' % (r1, c1, p1) )
+
+
     #========.. Plot ..========
     for j, info in enumerate(plotting_info):
         lim = (int)(indexes[j])
         plt.plot(info[:lim], label=all_players[j].get_id())
     plt.legend()
     plt.grid(True)
-    plt.xlabel('time')
+    plt.xlabel('time (x10)')
     plt.ylabel('reward')
     plt.savefig(report_name[:-4] + '.png')
     plt.show()
@@ -154,6 +170,13 @@ def main():
         end_timestamp = datetime.now().strftime("_%m%d_%H-%M-%S")
         ghost.write('ENDED SUCCESsFULLY at {}'.format(end_timestamp))
         print ('-Log in {}-'.format(report_name))
+
+    dic_ucb = pro_player_two.best_arm_info()
+    dic_rcb = pro_player_one.best_arm_info()
+
+    if dic_ucb['index'] > pro_player_one.get_num_arms():
+        return 1
+    return 0
 
 def double_print(g, d, s):
     print (s)

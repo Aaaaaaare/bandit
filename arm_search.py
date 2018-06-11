@@ -1,5 +1,5 @@
 import pro_players
-from my_players import kl_ucb_alpha, ucb_alpha
+from my_players import kl_ucb_alpha, ucb_alpha, RCB_I_alpha
 
 import numpy as np
 
@@ -43,6 +43,14 @@ class alpha_0:
 	def best_arm_reward(self):
 		return max(self.gambler.real_rewards/(self.gambler.real_costs))
 
+	def best_arm_info(self):
+		i = np.argmax(self.gambler.real_rewards/(self.gambler.real_costs + 1e-8))
+		r = self.gambler.real_rewards[i]/self.gambler.pulls[i]
+		c = self.gambler.real_costs[i]/self.gambler.pulls[i]
+		p = self.gambler.pulls[i]
+
+		return {'index': i, 'reward': r, 'cost': c, 'pulls': p}
+
 # =====================================================
 # Budget know.
 # Infinite arms - Unknown.
@@ -58,11 +66,15 @@ class alpha_I(alpha_0):
 		self.c = 0.37
 
 		self.budget = budget
+		gb = 'rcb'
 
 		# If speficied, override
 		if params != None:
 			if 'beta' in params:
 				self.beta = params['beta']
+		if params != None:
+			if 'gambler' in params:
+				gb = params['gambler']
 
 		if self.beta < 1:
 			self.num_arms = int(self.c * np.power(self.budget, self.beta/2.0))
@@ -80,11 +92,16 @@ class alpha_I(alpha_0):
 		self.new_arm = False
 		self.initial_run = True
 
-		kl = False
+		
 		# create my gambler. It is Blind to the infinity of the arms
-		if kl:
+		if gb == 'kl':
 			self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		elif gb == 'ucb1':
+			self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		elif gb == 'rcb':
+			self.gambler = RCB_I_alpha(num_arms = self.num_arms, budget = self.budget)
 		else:
+			print ('Error in gambler. {} is not a valid MBA. Using UCB1 instead'.format(gb))
 			self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 
 	def play(self, casino):
@@ -116,7 +133,7 @@ class alpha_I(alpha_0):
 					self.new_arm = False
 
 	def get_id(self):
-		return 'alpha-I'
+		return 'alpha-I' + ', ' + self.gambler.get_id()
 
 
 
@@ -132,10 +149,16 @@ class alpha_II(alpha_0):
 		# algorithm parameter
 		self.beta = 1.0
 
+		gb = 'rcb'
+
 		# If speficied, override
 		if params != None:
 			if 'beta' in params:
 				self.beta = params['beta']
+		if params != None:
+			if 'gambler' in params:
+				gb = params['gambler']
+
 
 		# We start with one arms
 		self.num_arms = 1
@@ -159,9 +182,18 @@ class alpha_II(alpha_0):
 		self.initial_run = True
 		self.counter = self.num_arms
 
-		# create my gambler. Blind to the infinity of the arms
-		self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget, 
-			is_infinity = False)
+		self.tt = 1.0
+	
+		# create my gambler. It is Blind to the infinity of the arms
+		if gb == 'kl':
+			self.gambler = kl_ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		elif gb == 'ucb1':
+			self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
+		elif gb == 'rcb':
+			self.gambler = RCB_I_alpha(num_arms = self.num_arms, budget = self.budget)
+		else:
+			print ('Error in gambler. {} is not a valid MBA. Using UCB1 instead'.format(gb))
+			self.gambler = ucb_alpha(num_arms = self.num_arms, budget = self.budget)
 
 	def play(self, casino):
 
@@ -195,18 +227,25 @@ class alpha_II(alpha_0):
 
 			self.counter -= 1
 
-	def get_epsilon():
-		t1 = 1.0/np.log(self.gambler.t)
+	def get_epsilon(self):
+		#t1 = 1.0/np.log(self.gambler.t)
 
-		t2_1 = max(self.gambler.pulls/(self.gambler.pulls + self.gambler.costs))
-		t2_2 = np.mean(self.gambler.pulls/(self.gambler.pulls + self.gambler.costs))
-		t3_1 = self.gambler.pulls[-1]/(self.gambler.pulls[-1] + self.gambler.costs[-1])
-		t3_2 = t2_2
+		t2_1 = max(self.gambler.rewards/(self.gambler.rewards + self.gambler.costs))
+		t2_2 = np.mean(self.gambler.rewards/(self.gambler.rewards + self.gambler.costs))
+		t3_1 = self.gambler.rewards[-1]/(self.gambler.rewards[-1] + self.gambler.costs[-1])
+		#t3_2 = t2_2
 
-		t2 = 1 - (t2_1 - t2_2)
-		t3 = np.log(1 + (t3_1 - t3_2))
+		t2 = 1.0 - (t2_1 - t2_2)
+		
+		#t3 = np.log(1.0 + (t3_1 - t3_2))
+		if t3_1 > t2_2:
+			self.tt += 1.0
+		else:
+			self.tt = max(1.0, self.tt - 1.0)
 
-		return t1 * np.power(t2, self.gamma) * np.power(t3, self.theta)
+		t1 = 1.0/np.log(self.gambler.t/self.tt)
+
+		return (t1 * np.power(t2, self.gamma) )
 
 	def get_id(self):
-		return 'alpha-II'
+		return 'alpha-II' + ', ' + self.gambler.get_id()
